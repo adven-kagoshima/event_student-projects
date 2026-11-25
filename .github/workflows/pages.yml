@@ -1,6 +1,7 @@
 # ランチャーを GitHub Pages に公開する
 # 公開先: https://adven-kagoshima.github.io/event_student-projects/
 # 公開するファイルは .github/scripts/build_pages.py で集める（Web に必要なものだけ）
+# build と deploy はジョブを分ける（同じジョブで deploy すると、アップロードした artifact が見つからずに失敗することがある）
 name: Deploy to GitHub Pages
 
 on:
@@ -18,11 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,5 +32,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
