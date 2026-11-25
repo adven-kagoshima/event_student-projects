@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>みんなのゲームであそぼう！ | IT Adventure 生徒作品展示</title>
+<link rel="icon" href="launcher/assets/favicon.png">
+<style>
+  /* デザイン: IT Adventure（https://it-adventure.net/）のサイトに合わせる（案A、2026-11-22 決定）
+     背景画像は launcher/assets/site/、フォントは launcher/assets/fonts/（OFL）に同梱してオフラインで表示する */
+  @font-face { font-family: "DotGothic16"; src: url("launcher/assets/fonts/DotGothic16-Regular.ttf") format("truetype"); font-display: block; }
+  @font-face { font-family: "M PLUS 1p"; font-weight: 700; src: url("launcher/assets/fonts/MPLUS1p-Bold.ttf") format("truetype"); font-display: block; }
+  @font-face { font-family: "M PLUS 1p"; font-weight: 800; src: url("launcher/assets/fonts/MPLUS1p-ExtraBold.ttf") format("truetype"); font-display: block; }
+
+  :root {
+    --ink: #004132;
+    --orange: #F39800;
+    --pink: #E6337A;
+    --leaf: #39A935;
+    --sky1: #BDEBFC;
+    --sky2: #5FDBF7;
+    --grass: #6DB52C;
+    --font: "M PLUS 1p", "BIZ UDPGothic", "Meiryo", sans-serif;
+    --dot: "DotGothic16", "MS Gothic", monospace;
+    --sky-bg:
+      url("launcher/assets/site/back_top.png") center 78% / cover no-repeat,
+      linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 70%, #2BC52F 70.1%, var(--grass) 100%);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: var(--grass) url("launcher/assets/site/back_green.png") center / cover no-repeat fixed;
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: 700;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    overflow-x: hidden;
+  }
+  img { -webkit-user-drag: none; }
+
+  /* ---------- 一覧: 空と丘のヘッダー ---------- */
+  .hero {
+    position: relative;
+    height: 400px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    padding-bottom: 20px;
+    background: var(--sky-bg);
+  }
+  .hero .logo { display: block; height: 96px; }
+  .hero h1 { margin: 0; }
+  .hero h1 span {
+    display: inline-block;
+    padding: 6px 26px;
+    background: var(--orange);
+    color: #fff;
+    font-size: 66px; font-weight: 800; letter-spacing: .04em; line-height: 1.2;
+    box-shadow: 8px 8px 0 rgba(0,65,50,.25);
+  }
+  .hero p {
+    margin: 6px 0 0;
+    padding: 8px 22px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.85);
+    font-size: 26px;
+  }
+  /* サイトのキャラクター（右下で少し跳ねる） */
+  .chara {
+    position: absolute; z-index: 1;
+    left: calc(50% + 480px);  /* 見出しの右隣に置く（画面の端に寄せすぎない） */
+    bottom: -20px;
+    height: 420px;
+    pointer-events: none;
+    animation: hop 2.4s ease-in-out infinite;
+  }
+  @keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  /* 浮かぶ四角 */
+  .float { position: absolute; border: 3px solid rgba(255,255,255,.85); animation: drift 7s ease-in-out infinite; }
+  .float.fill { border: 0; background: rgba(255,255,255,.75); }
+  @keyframes drift { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-18px) rotate(8deg); } }
+
+  /* ---------- 一覧: 作品 ---------- */
+  .wrap { max-width: 1760px; margin: 0 auto; padding: 0 48px; }
+  .group { margin-top: 104px; text-align: center; }
+  .group:first-child { margin-top: 0; }  /* 最初のグループはヘッダーのすぐ下に */
+  /* グループ見出し: [名前＋説明｜作品数] のブロック。左右にドットの線を伸ばす */
+  .group h2 {
+    display: flex; align-items: center; gap: 28px;
+    margin: 0 0 36px;
+    font-weight: 800;
+  }
+  .group h2::before, .group h2::after {
+    content: ""; flex: 1; height: 10px;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,.85) 0 10px, transparent 10px 22px);
+  }
+  .group h2 .tab {
+    display: flex; align-items: stretch;
+    width: 600px; max-width: 100%;  /* 3グループで幅をそろえる */
+    outline: 4px solid var(--ink);
+    background: var(--tabc);
+    color: #fff;
+    box-shadow: 10px 10px 0 rgba(0,40,30,.35);
+  }
+  .group h2 .txt {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    flex: 1;
+    padding: 12px 34px 14px 36px;
+    text-align: left;
+  }
+  .group h2 .lbl { font-size: 52px; line-height: 1.1; letter-spacing: .03em; text-shadow: 4px 4px 0 var(--tabd); }
+  .group h2 small { margin-top: 4px; font-size: 22px; font-weight: 700; }
+  .group h2 .cnt {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 0 22px;
+    background: var(--tabd);
+    font-family: var(--dot); font-weight: 400; font-size: 20px; line-height: 1.1;
+  }
+  .group h2 .cnt b { font-size: 46px; font-weight: 400; color: #F9E83B; }
+  .group[data-type="unity"]   { --tabc: #0F6FB7; --tabd: #0A4E82; }
+  .group[data-type="scratch"] { --tabc: #F39800; --tabd: #B87300; }
+  .group[data-type="web"]     { --tabc: #E6337A; --tabd: #A8205A; }
+
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;  /* 端数の行も中央にそろえる */
+    gap: 40px;
+  }
+  .grid .card { width: calc((100% - 2 * 40px) / 3); max-width: 560px; }  /* 3列 */
+  /* カード: ぼかさない影でドット風 */
+  .card {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    outline: 4px solid var(--ink);
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 10px 10px 0 rgba(0,40,30,.35);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .card:hover { transform: translate(-3px, -5px); box-shadow: 14px 16px 0 rgba(0,40,30,.35); }
+  .card:active { transform: translate(5px, 6px); box-shadow: 4px 4px 0 rgba(0,40,30,.35); }
+  .card:focus-visible { outline: 6px solid var(--pink); }
+  .thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 6px 6px 0 0;
+    border-bottom: 4px solid var(--ink);
+    background: var(--tabc);
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb .ph {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    padding: 24px;
+    font-size: 34px; font-weight: 800; color: #fff; text-align: center;
+  }
+  .thumb .play {
+    position: absolute; right: 14px; bottom: 14px;
+    padding: 8px 20px;
+    background: var(--orange);
+    color: #fff;
+    font-family: var(--dot); font-size: 28px;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.3);
+  }
+  .info { padding: 22px 28px 26px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .title {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .author { font-family: var(--dot); font-size: 25px; color: #3D6B5C; }
+  /* 操作方法: キーの形（キーキャップ）＋ひと言 */
+  .ctrl {
+    margin-top: 4px;
+    padding-top: 14px;
+    border-top: 3px dashed #CFE0D8;
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+  }
+  .ctrl .c { display: inline-flex; align-items: center; gap: 8px; font-size: 21px; }
+  .ctrl kbd {
+    display: inline-block;
+    min-width: 34px;
+    padding: 3px 9px 2px;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 3px 0 var(--ink);
+    font-family: var(--dot); font-size: 20px; line-height: 1.2; text-align: center;
+  }
+  .ctrl kbd.mouse { background: #FFF1D0; }
+  .ctrl kbd + kbd { margin-left: -2px; }
+
+  footer {
+    padding: 88px 0 64px;
+    text-align: center;
+    color: #fff;
+    font-family: var(--dot); font-size: 30px;
+    text-shadow: 3px 3px 0 rgba(0,40,30,.4);
+  }
+
+  /* ---------- プレイヤー ---------- */
+  #player {
+    position: fixed; inset: 0;
+    z-index: 10;
+    background: #000;
+    display: none;
+  }
+  #player.open { display: block; }
+  #player iframe {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border: 0;
+    background: #000;
+  }
+  #back {
+    position: absolute; top: 14px; left: 14px;
+    z-index: 3;
+    padding: 10px 24px 10px 18px;
+    border: 0;
+    outline: 4px solid #fff;
+    background: var(--orange);
+    color: #fff;
+    font: 800 28px var(--font);
+    cursor: pointer;
+    box-shadow: 6px 6px 0 rgba(0,0,0,.45);
+    opacity: .94;
+  }
+  #back:hover { opacity: 1; }
+  #back:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 rgba(0,0,0,.45); }
+
+  #loading {
+    position: absolute; inset: 0;
+    z-index: 2;
+    display: none;
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 28px;
+    padding-bottom: 80px;
+    background: var(--sky-bg);
+    color: var(--ink);
+    font-family: var(--dot); font-size: 52px;
+  }
+  #loading.show { display: flex; }
+  #loading .chara { right: 4%; bottom: 4%; height: 46vh; }
+  #loading .name {
+    max-width: 80vw;
+    padding: 6px 24px;
+    background: var(--orange); color: #fff;
+    font-family: var(--font); font-weight: 800; font-size: 34px; text-align: center;
+    box-shadow: 6px 6px 0 rgba(0,65,50,.25);
+  }
+  .dots { display: flex; gap: 22px; }
+  .dots i { width: 34px; height: 34px; animation: bounce 1s infinite ease-in-out; }
+  .dots i:nth-child(1) { background: #8CD30C; }
+  .dots i:nth-child(2) { background: #FF3DA1; animation-delay: .12s; }
+  .dots i:nth-child(3) { background: #0F6FB7; animation-delay: .24s; }
+  .dots i:nth-child(4) { background: #FFA100; animation-delay: .36s; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-30px); } }
+
+  /* ---------- まだあそぶ？ ---------- */
+  #idle {
+    position: fixed; inset: 0;
+    z-index: 20;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,65,50,.55);
+  }
+  #idle.show { display: flex; }
+  #idle .box {
+    width: min(760px, 90vw);
+    padding: 52px 40px;
+    outline: 6px solid var(--ink);
+    background: #fff;
+    text-align: center;
+    box-shadow: 16px 16px 0 rgba(0,0,0,.3);
+  }
+  #idle h3 {
+    display: inline-block;
+    margin: 0;
+    padding: 4px 28px;
+    background: var(--orange); color: #fff;
+    font-size: 68px; font-weight: 800;
+  }
+  #idle p { margin: 20px 0 36px; font-size: 30px; }
+  #idle p b { font-family: var(--dot); font-size: 48px; color: var(--pink); }
+  #idle button {
+    padding: 18px 72px;
+    border: 0;
+    background: var(--leaf);
+    color: #fff;
+    font: 800 40px var(--font);
+    cursor: pointer;
+    box-shadow: 0 8px 0 #24761F;
+  }
+
+  @media (max-width: 900px) {
+    .hero { height: 480px; }
+    .hero .logo { height: 60px; }
+    .hero h1 span { font-size: 40px; }
+    .hero p { font-size: 18px; }
+    .chara { display: none; }
+    .wrap { padding: 0 16px; }
+    .grid { gap: 24px; }
+    .grid .card { width: 100%; max-width: 560px; }
+  }
+</style>
+</head>
+<body>
+
+<main id="list">
+  <header class="hero">
+    <i class="float" style="left:12%;top:18%;width:34px;height:34px"></i>
+    <i class="float fill" style="left:17%;top:30%;width:22px;height:22px;animation-delay:-2s"></i>
+    <i class="float" style="right:14%;top:24%;width:26px;height:26px;animation-delay:-4s"></i>
+    <i class="float fill" style="right:20%;top:12%;width:40px;height:40px;animation-delay:-1s"></i>
+    <img class="logo" src="launcher/assets/logo.svg" alt="IT Adventure">
+    <h1><span>みんなのゲームであそぼう！</span></h1>
+    <p>IT Adventure 生徒作品展示 ／ マイアミフェスタ2026</p>
+    <img class="chara" src="launcher/assets/site/character.png" alt="">
+  </header>
+  <div class="wrap">
+    <div id="groups"></div>
+    <footer>あそびたい さくひんを タッチしてね！</footer>
+  </div>
+</main>
+
+<div id="player" aria-hidden="true">
+  <button id="back" type="button">🏠 もどる</button>
+  <div id="loading">
+    <div class="dots"><i></i><i></i><i></i><i></i></div>
+    <div>よみこみ中…</div>
+    <div class="name" id="loadingName"></div>
+    <img class="chara" src="launcher/assets/site/character.png" alt="">
+  </div>
+</div>
+
+<div id="idle" role="dialog" aria-modal="true">
+  <div class="box">
+    <h3>まだあそぶ？</h3>
+    <p><b id="idleCount">10</b> びょうで さいしょの がめんに もどるよ</p>
+    <button type="button">あそぶ！</button>
+  </div>
+</div>
+
+<script src="launcher/works.js"></script>
+<script>
+(() => {
+  'use strict';
+  const CFG = Object.assign({ idleTimeoutSec: 180, confirmSec: 10, reloadAfterMin: 30 }, window.LAUNCHER_CONFIG);
+  // 動作確認用: index.html?idle=10 で無操作タイムアウトを10秒にする
+  const params = new URLSearchParams(location.search);
+  const idleParam = Number(params.get('idle'));
+  if (idleParam > 0) CFG.idleTimeoutSec = idleParam;
+  // 展示PC（ローカル）か、GitHub Pages などの Web か。?mode=local / ?mode=web で切り替えて確認できる
+  //   ローカル: 作品は手元のファイル（path）から読み込み、無人運用の機能（タイムアウト・再読み込み・操作制限）を使う
+  //   Web    : 公開中の URL（web）があればそちらから読み込み、無人運用の機能は使わない
+  //            （別サイトの作品は中の操作を検知できず、遊んでいる途中でタイムアウトしてしまうため）
+  const LOCAL = params.has('mode') ? params.get('mode') !== 'web'
+    : location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]', ''].includes(location.hostname);
+  const KIOSK = LOCAL;
+  const GROUPS = [
+    { type: 'unity',   label: 'Unity',   sub: 'ユニティで つくった 3Dや2Dのゲーム' },
+    { type: 'scratch', label: 'Scratch', sub: 'スクラッチで つくったゲーム' },
+    { type: 'web',     label: 'Web',     sub: 'ウェブで つくった さくひん' },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const player = $('player'), loading = $('loading'), idleBox = $('idle'), idleCount = $('idleCount');
+
+  // ---------- 一覧を作る ----------
+  const groupsEl = $('groups');
+  for (const g of GROUPS) {
+    const works = (window.WORKS || []).filter((w) => w.type === g.type);
+    if (!works.length) continue;
+    const sec = document.createElement('section');
+    sec.className = 'group';
+    sec.dataset.type = g.type;
+    const h2 = document.createElement('h2');
+    h2.innerHTML = '<span class="tab">'
+      + '<span class="txt"><span class="lbl"></span><small></small></span>'
+      + '<span class="cnt"><b></b>さくひん</span></span>';
+    h2.querySelector('.lbl').textContent = g.label;
+    h2.querySelector('small').textContent = g.sub;
+    h2.querySelector('.cnt b').textContent = works.length;
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    for (const w of works) grid.appendChild(makeCard(w));
+    sec.append(h2, grid);
+    groupsEl.appendChild(sec);
+  }
+
+  function makeCard(w) {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'card';
+    card.innerHTML = '<div class="thumb"><img alt="" decoding="async"><span class="play">▶ あそぶ</span></div>'
+      + '<div class="info"><div class="title"></div><div class="author"></div></div>';
+    const img = card.querySelector('img');
+    img.onerror = () => {
+      const ph = document.createElement('div');
+      ph.className = 'ph';
+      ph.textContent = w.title;
+      img.replaceWith(ph);
+    };
+    if (w.thumbPos) img.style.objectPosition = w.thumbPos;
+    img.src = w.thumb;
+    card.querySelector('.title').textContent = w.title;
+    card.querySelector('.author').textContent = 'つくった人：' + w.author;
+    if (w.controls && w.controls.length) card.querySelector('.info').appendChild(makeControls(w.controls));
+    card.addEventListener('click', () => openWork(w));
+    return card;
+  }
+
+  // 操作方法 [キー, せつめい] の並び。キーは空白区切りで別々のキーキャップにする
+  function makeControls(list) {
+    const box = document.createElement('div');
+    box.className = 'ctrl';
+    for (const [keys, text] of list) {
+      const c = document.createElement('span');
+      c.className = 'c';
+      for (const k of keys.split(' ')) {
+        const kbd = document.createElement('kbd');
+        const mouse = /クリック|ドラッグ/.test(k);
+        if (mouse) kbd.className = 'mouse';
+        kbd.textContent = (mouse ? '🖱 ' : '') + k;
+        c.appendChild(kbd);
+      }
+      c.appendChild(document.createTextNode(text));
+      box.appendChild(c);
+    }
+    return box;
+  }
+
+  // ---------- プレイヤー ----------
+  let frame = null;
+  let loadingTimer = 0;
+
+  function openWork(w) {
+    closeWork();
+    clearReloadTimer();
+    $('loadingName').textContent = w.title;
+    loading.classList.add('show');
+    frame = document.createElement('iframe');
+    frame.allow = 'fullscreen; autoplay; gamepad';
+    frame.allowFullscreen = true;
+    frame.src = (!LOCAL && w.web) ? w.web : encodeURI(w.path);  // 挿入前に src を決めて、履歴を増やさない
+    frame.addEventListener('load', onFrameLoad);
+    player.appendChild(frame);
+    player.classList.add('open');
+    player.setAttribute('aria-hidden', 'false');
+    markActive();
+    // 読み込みが終わらなくても、いつまでも隠したままにはしない
+    loadingTimer = setTimeout(hideLoading, 20000);
+  }
+
+  function onFrameLoad() {
+    if (!frame) return;
+    hideLoading();
+    hookFrames();
+    try { frame.contentWindow.focus(); } catch (e) {}
+  }
+
+  function hideLoading() {
+    clearTimeout(loadingTimer);
+    loading.classList.remove('show');
+  }
+
+  function closeWork() {
+    hideIdle();
+    hideLoading();
+    if (frame) {
+      // WebGL / WASM のメモリを確実に手放すため、いったん about:blank にしてから消す
+      try { frame.src = 'about:blank'; } catch (e) {}
+      const f = frame;
+      frame = null;
+      setTimeout(() => f.remove(), 50);
+    }
+    if (player.classList.contains('open')) {
+      player.classList.remove('open');
+      player.setAttribute('aria-hidden', 'true');
+      startReloadTimer();
+    }
+    window.focus();
+  }
+
+  $('back').addEventListener('click', closeWork);
+
+  // ---------- 無操作タイムアウト ----------
+  const ACTIVITY = ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'wheel'];
+  const hooked = new WeakSet();
+  let lastActive = Date.now();
+  let idleLeft = 0;
+
+  function markActive() { lastActive = Date.now(); }
+
+  // 作品のページ（とその中の iframe）にも操作検知とキー制限を付ける。
+  // ページ遷移すると document が変わるので、document 単位で付け直す。
+  function hookWindow(win, depth) {
+    let doc;
+    try { doc = win.document; } catch (e) { return; }  // 別オリジンは触れない
+    if (!doc) return;
+    if (!hooked.has(doc)) {
+      hooked.add(doc);
+      for (const t of ACTIVITY) win.addEventListener(t, markActive, { capture: true, passive: true });
+      guardWindow(win);
+    }
+    if (depth < 3) for (let i = 0; i < win.frames.length; i++) hookWindow(win.frames[i], depth + 1);
+  }
+  function hookFrames() {
+    if (KIOSK && frame && frame.contentWindow) hookWindow(frame.contentWindow, 0);
+  }
+
+  setInterval(() => {
+    if (!KIOSK || !frame) return;
+    hookFrames();
+    if (idleLeft > 0) {
+      idleLeft--;
+      idleCount.textContent = idleLeft;
+      if (idleLeft <= 0) closeWork();
+    } else if (Date.now() - lastActive >= CFG.idleTimeoutSec * 1000) {
+      showIdle();
+    }
+  }, 1000);
+
+  function showIdle() {
+    idleLeft = CFG.confirmSec;
+    idleCount.textContent = idleLeft;
+    idleBox.classList.add('show');
+  }
+  function hideIdle() {
+    idleLeft = 0;
+    idleBox.classList.remove('show');
+  }
+  // 「まだあそぶ？」はどこをタッチしても延長
+  idleBox.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    hideIdle();
+    markActive();
+    try { frame && frame.contentWindow.focus(); } catch (err) {}
+  });
+
+  for (const t of ACTIVITY) window.addEventListener(t, markActive, { capture: true, passive: true });
+
+  // ---------- 一覧に30分いたらリロード ----------
+  let reloadTimer = 0;
+  function startReloadTimer() {
+    clearReloadTimer();
+    if (!KIOSK) return;
+    reloadTimer = setTimeout(() => location.reload(), CFG.reloadAfterMin * 60 * 1000);
+  }
+  function clearReloadTimer() { clearTimeout(reloadTimer); }
+  startReloadTimer();
+
+  // ---------- ブラウザ操作の制限 ----------
+  function isBlockedKey(e) {
+    const k = e.key;
+    const ctrl = e.ctrlKey || e.metaKey;
+    if (k === 'F5' || k === 'F3' || k === 'F6' || k === 'F7' || k === 'F12' || k === 'BrowserBack' || k === 'BrowserForward' || k === 'BrowserRefresh' || k === 'BrowserHome') return true;
+    if (e.altKey && (k === 'ArrowLeft' || k === 'ArrowRight' || k === 'Home')) return true;
+    if (ctrl && /^[rpsofghjklnudtw+\-=0]$/i.test(k)) return true;
+    if (ctrl && e.shiftKey && /^[ijcb]$/i.test(k)) return true;
+    return false;
+  }
+  function guardWindow(win) {
+    const doc = win.document;
+    win.addEventListener('keydown', (e) => { if (isBlockedKey(e)) e.preventDefault(); }, true);
+    doc.addEventListener('contextmenu', (e) => e.preventDefault(), true);
+    doc.addEventListener('selectstart', (e) => {
+      const t = e.target;
+      if (!(t && t.closest && t.closest('input, textarea, [contenteditable]'))) e.preventDefault();
+    }, true);
+    doc.addEventListener('dragstart', (e) => { if (e.target && e.target.tagName === 'IMG') e.preventDefault(); }, true);
+    // マウスの「戻る／進む」ボタン
+    const noNavButtons = (e) => { if (e.button === 3 || e.button === 4) e.preventDefault(); };
+    win.addEventListener('mouseup', noNavButtons, true);
+    win.addEventListener('auxclick', noNavButtons, true);
+    // ピンチやCtrl+ホイールの拡大
+    win.addEventListener('wheel', (e) => { if (e.ctrlKey) e.preventDefault(); }, { capture: true, passive: false });
+    if (win !== window) {
+      // 作品の中から別ウィンドウを開いたり、ランチャーごと移動したりさせない
+      try { win.open = () => null; } catch (e) {}
+      doc.addEventListener('click', (e) => {
+        const a = e.target && e.target.closest && e.target.closest('a[href]');
+        if (!a) return;
+        const target = (a.getAttribute('target') || '').toLowerCase();
+        let external = false;
+        try { external = new URL(a.href, doc.baseURI).origin !== location.origin; } catch (err) { external = true; }
+        if (external || target === '_blank' || target === '_top' || target === '_parent') e.preventDefault();
+      }, true);
+    }
+  }
+  if (KIOSK) {
+    guardWindow(window);
+    document.addEventListener('gesturestart', (e) => e.preventDefault());
+  }
+})();
+</script>
+</body>
+</html>

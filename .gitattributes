@@ -1,0 +1,5 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+*.bat text eol=crlf
+# 作品の HTML はそのまま保存する（改行コードを変換しない）
+works/scratch/*.html -text

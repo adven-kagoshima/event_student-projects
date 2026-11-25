@@ -1,0 +1,40 @@
+[submodule "works/unity/spaceavoid"]
+	shallow = true
+	path = works/unity/spaceavoid
+	url = https://github.com/nostra3910/avoidgame.git
+	branch = main
+[submodule "works/unity/memopath"]
+	shallow = true
+	path = works/unity/memopath
+	url = https://github.com/fumiharuhiraya/MEMOPATH.git
+	branch = main
+[submodule "works/unity/chainmaster"]
+	shallow = true
+	path = works/unity/chainmaster
+	url = https://github.com/adven-students/next_contest_ChainMaster.git
+	branch = main
+[submodule "works/unity/kagoshimasaigai"]
+	shallow = true
+	path = works/unity/kagoshimasaigai
+	url = https://github.com/eto-sora/KagoshimaSaigai.git
+	branch = main
+[submodule "works/unity/rush90"]
+	shallow = true
+	path = works/unity/rush90
+	url = https://github.com/adven-students/Rush60.git
+	branch = main
+[submodule "works/unity/satsumabritishwar"]
+	shallow = true
+	path = works/unity/satsumabritishwar
+	url = https://github.com/adven-students/Satsuma-BritishWar.git
+	branch = main
+[submodule "works/web/oshihakkutsu"]
+	shallow = true
+	path = works/web/oshihakkutsu
+	url = https://github.com/adven-students/OshiHakkutsu.git
+	branch = main
+[submodule "works/web/tunachannel"]
+	shallow = true
+	path = works/web/tunachannel
+	url = https://github.com/8n09nozn/Tuna_Web.git
+	branch = build
